@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Login User</title>
+        <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    </head>
+    <body>
+        <input type="text" id="userName" placeholder="enter username">
+        <input type="text" id="password" placeholder="enter password">
+        <button>Login</button>
+
+        <script>
+            $("button").click(function(e){
+                let userName = $("#userName").val();
+                let password = $("#password").val();
+                let obj = {
+                    userName: userName,
+                    password: password
+                };
+                // console.log(obj);
+                $.ajax({
+                    url: "/login/user",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(obj)
+                });
+            });
+        </script>
+    </body>
+</html>
