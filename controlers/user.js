@@ -45,4 +45,17 @@ User.prototype.updateUser = (userName, fullName, callback) => {
     });
 };
 
-module.exports =User;
+User.prototype.deleteUser = (userName, callback) => {
+    UserCollection.deleteOne({userName: userName}, (error, result) => {
+        callback(error, result);
+    });
+};
+
+User.prototype.loginUser = (userName, password, callback) => {
+    UserCollection.find({userName: userName, password: password}, (error, result) => {
+        console.log(userName + " is logged in");
+        callback(error, result);
+    });
+};
+
+module.exports = User;

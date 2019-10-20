@@ -79,6 +79,24 @@ app.get("/update/user/by/username", (req, res) => {
     });
 });
 
+app.get("/delete/user/by/username", (req, res) => {
+    userObj.deleteUser(req.query.userName, (error, data) => {
+        res.send({
+            error: error,
+            data: data
+        });
+    });
+});
+
+app.post("/login/user", (req, res) => {
+    userObj.loginUser(req.body.userName, req.body.password, (error, data) => {
+        res.send({
+            error: error,
+            data: data
+        });
+    });
+});
+
 const server = http.listen(7000, function() {
     console.log('listening on *:7000');
 });
