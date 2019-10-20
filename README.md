@@ -3,7 +3,7 @@
 Run the program by using
 
 ```shell
-$ node index.js
+$ node app.js
 ```
 TODO
 Build supporting notes for this app. 

@@ -50,6 +50,35 @@ app.post("/register/user", (req, res) => {
     })
 });
 
+app.get("/get/all/registered/users", (req, res) => {
+    userObj.getUsers(function(error, data){
+        res.send({
+            error: error,
+            data: data
+        });
+    });
+});
+
+app.get("/get/users/by/fullname", (req, res) => {
+   const fullName = req.query.fullName;
+   userObj.getUser(fullName, function(error, data){
+       res.send({
+        error: error,
+        data: data
+       });
+   });
+});
+
+app.get("/update/user/by/username", (req, res) => {
+    userObj.updateUser(req.query.userName, req.query.fullName, (error, data, msg) => {
+        res.send({
+            error: error,
+            data: data,
+            message: msg
+        });
+    });
+});
+
 const server = http.listen(7000, function() {
     console.log('listening on *:7000');
 });
