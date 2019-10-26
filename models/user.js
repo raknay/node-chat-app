@@ -10,5 +10,5 @@
       registeredDate: { type: Date, required: true }
 	});
 	
-  exports.user = mongoose.model('user', userSchema, 'user');
+  exports.user = mongoose.model('User', userSchema, 'user');
 }).call(this);

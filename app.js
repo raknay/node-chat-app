@@ -8,6 +8,9 @@ const mongoose = require("mongoose");
 // import user constructor function form controlers module
 const UserClass = require("./controlers/user"); // create userClass reference to User consructor function 
 const userObj = new UserClass(); // create an object form UserClass
+// import message contructor function from message module
+const MessageClass = require("./controlers/message");
+const messageObj = new MessageClass();
 
 // Middleware 
 app.use(bodyParser.json());
@@ -34,6 +37,37 @@ app.get("/register", (req, res) => {
 
 app.get("/login", (req, res) => {
     res.render("login.ejs");
+});
+
+// socket
+io.sockets.on('connection', function(socket) {
+    socket.on('username', function(username) {
+        socket.username = username;
+        io.emit('is_online', ' <i>' + socket.username + ' joined the chat..</i>');
+    });
+
+    socket.on('disconnect', function(username) {
+        io.emit('is_online', ' <i>' + socket.username + ' left the chat..</i>');
+    })
+
+    socket.on('chat_message', function(message) {
+        messageObj.storeMessage({ userName:socket.username, text:message}, function(err,result){
+            console.log(err);
+            console.log(result);
+        });
+        io.emit('chat_message', '<strong>' + socket.username + '</strong>: ' + message);
+    });
+
+});
+
+// get messages
+app.get("/get/messages", (req, res) => {
+    messageObj.getMessages((error, data) => {
+        res.send({
+            error: error,
+            data: data
+        });
+    });
 });
 
 // save user to db
