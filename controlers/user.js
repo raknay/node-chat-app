@@ -1,6 +1,6 @@
 let UserCollection = require('../models/user').user;
 
-function User() {};
+function User() {}
 
 User.prototype.storeUser = function(data,callback){
 
@@ -23,7 +23,7 @@ User.prototype.storeUser = function(data,callback){
 };
 
 User.prototype.getUsers = function(callback){
-    UserCollection.find({}).exec(function(error, result) {
+    UserCollection.find({}).lean().exec(function(error, result) {
         callback(error, result)
     });
 };
@@ -57,5 +57,7 @@ User.prototype.loginUser = (userName, password, callback) => {
         callback(error, result);
     });
 };
+
+
 
 module.exports = User;

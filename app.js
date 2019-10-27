@@ -131,6 +131,54 @@ app.post("/login/user", (req, res) => {
     });
 });
 
+app.get("/get/messages/by/username", (req,res) => {
+    userObj.getUsers((error1, users) => {
+        messageObj.getMessages((error2, messages) => {
+            for(let user of users){
+                user.messageCount = 0;
+                for(let message of messages){
+                    if(user.userName === message.userName){
+                        user.messageCount += 1;
+                    }
+                }
+            }
+            for(let message in messages){
+
+            }
+            res.send({
+                users: users,
+                messages: messages
+            });
+        });
+    });
+});
+
+app.get("/get/messages/by/usernamev2", (req,res) => {
+    userObj.getUsers((error1, users) => {
+        messageObj.getMessages((error2, messages) => {
+            messageInfo = {};
+            for(let message of messages){
+                if(!messageInfo[message.userName]){
+                    messageInfo[message.userName] = [];
+                }
+                messageInfo[message.userName].push(message);
+            }
+
+            for(let user of users){
+                user.messageCount = 0;
+                user.messages = [];
+                if(messageInfo[user.userName]){
+                    user.messageCount = messageInfo[user.userName].length;
+                    user.messages = messageInfo[user.userName];
+                }
+            }
+            res.send({
+                users: users,
+                messages: messages
+            });
+        });
+    });
+});
 const server = http.listen(7000, function() {
     console.log('listening on *:7000');
 });

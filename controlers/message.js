@@ -24,6 +24,6 @@ Message.prototype.getMessages = function(callback){
     MessageCollection.find({}, (error, messages) => {
         callback(error, messages);
     });
-}
+};
 
 module.exports = Message;
