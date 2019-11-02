@@ -4,6 +4,7 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
 
 // import user constructor function form controlers module
 const UserClass = require("./controlers/user"); // create userClass reference to User consructor function 
@@ -14,6 +15,7 @@ const messageObj = new MessageClass();
 
 // Middleware 
 app.use(bodyParser.json());
+
 
 // middleware end
 
@@ -124,9 +126,16 @@ app.get("/delete/user/by/username", (req, res) => {
 
 app.post("/login/user", (req, res) => {
     userObj.loginUser(req.body.userName, req.body.password, (error, data) => {
+        if(data.length === 0){
+            error = "No user present";
+            return res.send({error});
+        }
+        const token = jwt.sign({userName: req.body.userName}, "nodechatapp");
+        console.log(token);
         res.send({
             error: error,
-            data: data
+            data: data,
+            token: token
         });
     });
 });
@@ -142,9 +151,7 @@ app.get("/get/messages/by/username", (req,res) => {
                     }
                 }
             }
-            for(let message in messages){
 
-            }
             res.send({
                 users: users,
                 messages: messages

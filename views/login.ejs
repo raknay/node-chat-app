@@ -13,6 +13,10 @@
         <button>Login</button>
 
         <script>
+            function success(data){
+                localStorage.setItem("token",data.token );
+                console.log(data.token);
+            }
             $("button").click(function(e){
                 let userName = $("#userName").val();
                 let password = $("#password").val();
@@ -24,8 +28,10 @@
                 $.ajax({
                     url: "/login/user",
                     type: "POST",
+                    success: success,
                     contentType: "application/json",
-                    data: JSON.stringify(obj)
+                    data: JSON.stringify(obj),
+                    headers: Authoi
                 });
             });
         </script>
