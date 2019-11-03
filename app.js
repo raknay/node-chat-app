@@ -6,6 +6,9 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 
+const redis = require("redis");
+const client = redis.createClient();
+
 // import user constructor function form controlers module
 const UserClass = require("./controlers/user"); // create userClass reference to User consructor function 
 const userObj = new UserClass(); // create an object form UserClass
@@ -16,7 +19,24 @@ const messageObj = new MessageClass();
 // Middleware 
 app.use(bodyParser.json());
 
-
+function authenticate (req, res, next){
+    if(req.headers.token){
+        const token = req.headers.token;
+        const decoded = jwt.verify(token, "nodechatapp");
+        const userName = decoded.userName;
+        if(userName){
+            next();
+        }else{
+            return res.send({
+                error: "Authorization required"
+            });
+        }
+    } else{
+        return res.send({
+            error: "Authentication required"
+        });
+    }
+}
 // middleware end
 
 // database connection
@@ -28,6 +48,22 @@ mongoose.connect("mongodb://localhost/chat-app?poolSize=100",{ useNewUrlParser: 
         console.log("MongoDb connection successful");
     }
 });
+
+// redis
+function setCache(key, data){
+    client.setex(key, 3600, JSON.stringify(data));
+}
+
+function getCache(key, callback){
+    client.get(key, function(error, result){
+        try{
+            const data = JSON.parse(result);
+            callback(data);
+        }catch(error){
+            callback(null);
+        }
+    });
+}
 
 app.get('/', function(req, res) {
     res.render('index.ejs');
@@ -64,12 +100,23 @@ io.sockets.on('connection', function(socket) {
 
 // get messages
 app.get("/get/messages", (req, res) => {
-    messageObj.getMessages((error, data) => {
-        res.send({
-            error: error,
-            data: data
-        });
+    getCache("cache", function(data){
+        if(data){
+            res.send({
+                error: error,
+                data: data
+            });
+        }else{
+            messageObj.getMessages((error, result) => {
+                setCache("cache", result);
+                res.send({
+                    error: error,
+                    data: result
+                });
+            });
+        }
     });
+    
 });
 
 // save user to db
@@ -140,7 +187,7 @@ app.post("/login/user", (req, res) => {
     });
 });
 
-app.get("/get/messages/by/username", (req,res) => {
+app.get("/get/messages/for/all/username", (req,res) => {
     userObj.getUsers((error1, users) => {
         messageObj.getMessages((error2, messages) => {
             for(let user of users){
@@ -160,7 +207,7 @@ app.get("/get/messages/by/username", (req,res) => {
     });
 });
 
-app.get("/get/messages/by/usernamev2", (req,res) => {
+app.get("/get/messages/for/all/usernamev2", (req,res) => {
     userObj.getUsers((error1, users) => {
         messageObj.getMessages((error2, messages) => {
             messageInfo = {};
@@ -186,6 +233,20 @@ app.get("/get/messages/by/usernamev2", (req,res) => {
         });
     });
 });
+
+app.get("/get/messages/by/username",authenticate,(req, res) => {
+    // console.log(req.headers);
+    const token = req.headers.token;
+    const decoded = jwt.verify(token, "nodechatapp");
+    const userName = decoded.userName;
+    messageObj.getMessagesByUsername(userName, (error, messages) => {
+        res.send({
+            error: error,
+            messages: messages
+        });
+    });
+});
+
 const server = http.listen(7000, function() {
     console.log('listening on *:7000');
 });

@@ -26,4 +26,10 @@ Message.prototype.getMessages = function(callback){
     });
 };
 
+Message.prototype.getMessagesByUsername = function(userName, callback){
+    MessageCollection.find({userName}, (error, messages) => {
+        callback(error, messages);
+    });
+};
+
 module.exports = Message;

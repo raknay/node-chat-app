@@ -58,6 +58,4 @@ User.prototype.loginUser = (userName, password, callback) => {
     });
 };
 
-
-
 module.exports = User;
