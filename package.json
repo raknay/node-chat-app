@@ -14,6 +14,6 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.6.13",
     "redis": "^2.8.0",
-    "socket.io": "^2.2.0"
+    "socket.io": "^2.4.0"
   }
 }
